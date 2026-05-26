@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { HeartPulse, Activity, Heart, Moon, TrendingUp, TrendingDown, Zap, ChevronDown } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import TimeRangeSelector from './TimeRangeSelector';
+import ChartWrapper from './ChartWrapper';
 import { getToday, filterByRange, formatChartDate } from '../utils/dataTransform';
 
 function getReadinessColor(score) {
@@ -183,24 +184,28 @@ export default function ReadinessCard({ readiness }) {
 
           <p className="stat-label" style={{ marginBottom: 12 }}>Readiness Trend</p>
           <TimeRangeSelector value={range} onChange={setRange} />
-          <ResponsiveContainer width="100%" height={140}>
-            <LineChart data={rangeData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-              <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-              <Tooltip contentStyle={{ background: 'var(--bg-card-elevated)', border: '1px solid var(--border-card)', borderRadius: 10 }} labelStyle={{ color: 'var(--text-secondary)', fontSize: 11 }} itemStyle={{ color: 'var(--text-primary)', fontSize: 12 }} />
-              <Line type="monotone" dataKey="score" stroke="var(--accent-purple-light)" strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
+          <ChartWrapper height={140}>
+            <ResponsiveContainer width="100%" height={140}>
+              <LineChart data={rangeData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+                <Tooltip contentStyle={{ background: 'var(--bg-card-elevated)', border: '1px solid var(--border-card)', borderRadius: 10 }} labelStyle={{ color: 'var(--text-secondary)', fontSize: 11 }} itemStyle={{ color: 'var(--text-primary)', fontSize: 12 }} />
+                <Line type="monotone" dataKey="score" stroke="var(--accent-purple-light)" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartWrapper>
 
           <p className="stat-label" style={{ marginBottom: 12, marginTop: 20 }}>HRV Trend</p>
-          <ResponsiveContainer width="100%" height={120}>
-            <LineChart data={rangeData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-              <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-              <Tooltip contentStyle={{ background: 'var(--bg-card-elevated)', border: '1px solid var(--border-card)', borderRadius: 10 }} labelStyle={{ color: 'var(--text-secondary)', fontSize: 11 }} itemStyle={{ color: 'var(--text-primary)', fontSize: 12 }} />
-              <Line type="monotone" dataKey="hrv" stroke="var(--accent-blue-light)" strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
+          <ChartWrapper height={120}>
+            <ResponsiveContainer width="100%" height={120}>
+              <LineChart data={rangeData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+                <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+                <Tooltip contentStyle={{ background: 'var(--bg-card-elevated)', border: '1px solid var(--border-card)', borderRadius: 10 }} labelStyle={{ color: 'var(--text-secondary)', fontSize: 11 }} itemStyle={{ color: 'var(--text-primary)', fontSize: 12 }} />
+                <Line type="monotone" dataKey="hrv" stroke="var(--accent-blue-light)" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartWrapper>
         </div>
       </div>
     </div>

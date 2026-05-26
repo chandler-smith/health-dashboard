@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { Footprints, Dumbbell, Flame, BedDouble, ChevronDown } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import TimeRangeSelector from './TimeRangeSelector';
+import ChartWrapper from './ChartWrapper';
 import { getToday, filterByRange, formatChartDate } from '../utils/dataTransform';
 
 const STEP_GOAL = 10000;
@@ -130,15 +131,17 @@ export default function ActivityCard({ healthData }) {
 
           <p className="stat-label" style={{ marginBottom: 12 }}>Daily Steps</p>
           <TimeRangeSelector value={range} onChange={setRange} />
-          <ResponsiveContainer width="100%" height={160}>
-            <BarChart data={rangeData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-              <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-              <Tooltip contentStyle={{ background: 'var(--bg-card-elevated)', border: '1px solid var(--border-card)', borderRadius: 10 }} labelStyle={{ color: 'var(--text-secondary)', fontSize: 11 }} itemStyle={{ color: 'var(--text-primary)', fontSize: 12 }} />
-              <ReferenceLine y={STEP_GOAL} stroke="var(--accent-blue)" strokeDasharray="4 2" strokeWidth={1} />
-              <Bar dataKey="steps" fill="var(--accent-blue-light)" radius={[4, 4, 0, 0]} opacity={0.85} />
-            </BarChart>
-          </ResponsiveContainer>
+          <ChartWrapper height={160}>
+            <ResponsiveContainer width="100%" height={160}>
+              <BarChart data={rangeData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+                <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+                <Tooltip contentStyle={{ background: 'var(--bg-card-elevated)', border: '1px solid var(--border-card)', borderRadius: 10 }} labelStyle={{ color: 'var(--text-secondary)', fontSize: 11 }} itemStyle={{ color: 'var(--text-primary)', fontSize: 12 }} />
+                <ReferenceLine y={STEP_GOAL} stroke="var(--accent-blue)" strokeDasharray="4 2" strokeWidth={1} />
+                <Bar dataKey="steps" fill="var(--accent-blue-light)" radius={[4, 4, 0, 0]} opacity={0.85} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartWrapper>
         </div>
       </div>
     </div>

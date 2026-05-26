@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { Scale, Target, TrendingDown, TrendingUp, ChevronDown } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import TimeRangeSelector from './TimeRangeSelector';
+import ChartWrapper from './ChartWrapper';
 import { getMostRecentWeight, getPreviousWeight, filterByRange, projectGoalDate, formatChartDate } from '../utils/dataTransform';
 
 const GOAL_WEIGHT = 180;
@@ -135,18 +136,20 @@ export default function WeightCard({ healthData }) {
           <TimeRangeSelector value={range} onChange={setRange} />
 
           {rangeData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={180}>
-              <LineChart data={rangeData} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
-                <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-                <YAxis
-                  domain={[Math.min(...rangeData.map(d => d.weight)) - 3, Math.max(...rangeData.map(d => d.weight)) + 3]}
-                  tick={{ fontSize: 10 }} tickLine={false} axisLine={false}
-                />
-                <Tooltip contentStyle={{ background: 'var(--bg-card-elevated)', border: '1px solid var(--border-card)', borderRadius: 10 }} labelStyle={{ color: 'var(--text-secondary)', fontSize: 11 }} itemStyle={{ color: 'var(--text-primary)', fontSize: 12 }} />
-                <ReferenceLine y={GOAL_WEIGHT} stroke="var(--accent-purple)" strokeDasharray="4 2" strokeWidth={1} label={{ value: 'Goal', position: 'insideTopRight', fill: 'var(--accent-purple-light)', fontSize: 10 }} />
-                <Line type="monotone" dataKey="weight" stroke="var(--accent-blue-light)" strokeWidth={2} dot={{ r: 2, fill: 'var(--accent-blue-light)' }} />
-              </LineChart>
-            </ResponsiveContainer>
+            <ChartWrapper height={180}>
+              <ResponsiveContainer width="100%" height={180}>
+                <LineChart data={rangeData} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
+                  <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+                  <YAxis
+                    domain={[Math.min(...rangeData.map(d => d.weight)) - 3, Math.max(...rangeData.map(d => d.weight)) + 3]}
+                    tick={{ fontSize: 10 }} tickLine={false} axisLine={false}
+                  />
+                  <Tooltip contentStyle={{ background: 'var(--bg-card-elevated)', border: '1px solid var(--border-card)', borderRadius: 10 }} labelStyle={{ color: 'var(--text-secondary)', fontSize: 11 }} itemStyle={{ color: 'var(--text-primary)', fontSize: 12 }} />
+                  <ReferenceLine y={GOAL_WEIGHT} stroke="var(--accent-purple)" strokeDasharray="4 2" strokeWidth={1} label={{ value: 'Goal', position: 'insideTopRight', fill: 'var(--accent-purple-light)', fontSize: 10 }} />
+                  <Line type="monotone" dataKey="weight" stroke="var(--accent-blue-light)" strokeWidth={2} dot={{ r: 2, fill: 'var(--accent-blue-light)' }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartWrapper>
           ) : (
             <p style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', padding: 24 }}>
               No weight data for this period

@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { Flame, Dumbbell, Wheat, Droplets, TrendingDown, TrendingUp, ChevronDown } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import TimeRangeSelector from './TimeRangeSelector';
+import ChartWrapper from './ChartWrapper';
 import { getToday, filterByRange, formatChartDate } from '../utils/dataTransform';
 
 const CALORIE_GOAL = 1900;
@@ -148,25 +149,27 @@ export default function NutritionCard({ dailySummary, healthData }) {
 
           <p className="stat-label" style={{ marginBottom: 12 }}>Daily Calories</p>
           <TimeRangeSelector value={range} onChange={setRange} />
-          <ResponsiveContainer width="100%" height={160}>
-            <BarChart data={rangeData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-              <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-              <Tooltip
-                contentStyle={{ background: 'var(--bg-card-elevated)', border: '1px solid var(--border-card)', borderRadius: 10 }}
-                labelStyle={{ color: 'var(--text-secondary)', fontSize: 11 }}
-                itemStyle={{ color: 'var(--text-primary)', fontSize: 12 }}
-              />
-              <ReferenceLine y={CALORIE_GOAL} stroke="var(--accent-purple)" strokeDasharray="4 2" strokeWidth={1} />
-              <Bar dataKey="cal" fill="url(#calGrad)" radius={[4, 4, 0, 0]} />
-              <defs>
-                <linearGradient id="calGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="var(--accent-purple-light)" />
-                  <stop offset="100%" stopColor="var(--accent-blue)" stopOpacity={0.6} />
-                </linearGradient>
-              </defs>
-            </BarChart>
-          </ResponsiveContainer>
+          <ChartWrapper height={160}>
+            <ResponsiveContainer width="100%" height={160}>
+              <BarChart data={rangeData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+                <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+                <Tooltip
+                  contentStyle={{ background: 'var(--bg-card-elevated)', border: '1px solid var(--border-card)', borderRadius: 10 }}
+                  labelStyle={{ color: 'var(--text-secondary)', fontSize: 11 }}
+                  itemStyle={{ color: 'var(--text-primary)', fontSize: 12 }}
+                />
+                <ReferenceLine y={CALORIE_GOAL} stroke="var(--accent-purple)" strokeDasharray="4 2" strokeWidth={1} />
+                <Bar dataKey="cal" fill="url(#calGrad)" radius={[4, 4, 0, 0]} />
+                <defs>
+                  <linearGradient id="calGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--accent-purple-light)" />
+                    <stop offset="100%" stopColor="var(--accent-blue)" stopOpacity={0.6} />
+                  </linearGradient>
+                </defs>
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartWrapper>
         </div>
       </div>
     </div>
