@@ -36,14 +36,6 @@ export default function App() {
           zIndex: 10,
           background: 'var(--bg-primary)',
         }}>
-          <h1 style={{
-            fontSize: 17,
-            fontWeight: 600,
-            color: 'var(--text-primary)',
-            letterSpacing: '-0.01em',
-          }}>
-            Chandler Health
-          </h1>
           <PulseIndicator lastFetched={lastFetched} />
         </header>
 
