@@ -1,7 +1,6 @@
-import { useState } from 'react';
-import { Flame, Dumbbell, Wheat, Droplets, TrendingDown, TrendingUp } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Flame, Dumbbell, Wheat, Droplets, TrendingDown, TrendingUp, ChevronDown } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
-import DetailDrawer from './DetailDrawer';
 import TimeRangeSelector from './TimeRangeSelector';
 import { getToday, filterByRange, formatChartDate } from '../utils/dataTransform';
 
@@ -10,7 +9,7 @@ const PROTEIN_GOAL = 150;
 
 function MacroBar({ protein, carbs, fat }) {
   const total = protein + carbs + fat;
-  if (total === 0) return <div className="progress-bar" style={{ height: 8 }} />;
+  if (total === 0) return <div style={{ height: 8, borderRadius: 4, background: 'var(--bg-card-elevated)' }} />;
   const pPct = (protein / total) * 100;
   const cPct = (carbs / total) * 100;
   const fPct = (fat / total) * 100;
@@ -34,6 +33,7 @@ function StatPill({ color, label }) {
 export default function NutritionCard({ dailySummary, healthData }) {
   const [open, setOpen] = useState(false);
   const [range, setRange] = useState(7);
+  const expandRef = useRef(null);
 
   const today = getToday();
   const todaySummary = dailySummary.find(r => r.date === today) ?? null;
@@ -52,19 +52,33 @@ export default function NutritionCard({ dailySummary, healthData }) {
   }));
 
   const thisWeek = filterByRange(dailySummary, 7);
-  const lastWeek = filterByRange(dailySummary, 14).slice(0, 7);
+  const lastWeek = filterByRange(dailySummary, 14).filter(r => !filterByRange(dailySummary, 7).find(w => w.date === r.date));
   const avgThis = thisWeek.length ? Math.round(thisWeek.reduce((s, r) => s + r.caloriesIn, 0) / thisWeek.length) : 0;
   const avgLast = lastWeek.length ? Math.round(lastWeek.reduce((s, r) => s + r.caloriesIn, 0) / lastWeek.length) : 0;
 
   const todayActiveEnergy = healthData.find(r => r.date === today)?.activeEnergy ?? 0;
   const todayRestingEnergy = healthData.find(r => r.date === today)?.restingEnergy ?? 0;
 
+  function toggle() {
+    const next = !open;
+    setOpen(next);
+    if (next) {
+      setTimeout(() => {
+        expandRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 340);
+    }
+  }
+
   return (
-    <>
-      <div className="card" onClick={() => setOpen(true)}>
+    <div className="card">
+      {/* Collapsed header — tap to toggle */}
+      <div className="card-header" onClick={toggle}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
           <span className="stat-label">{today}</span>
-          <Flame size={16} color="var(--accent-purple-light)" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Flame size={14} color="var(--accent-purple-light)" />
+            <ChevronDown size={16} className={`chevron-icon${open ? ' open' : ''}`} />
+          </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 10 }}>
@@ -93,73 +107,73 @@ export default function NutritionCard({ dailySummary, healthData }) {
         )}
       </div>
 
-      <DetailDrawer open={open} onClose={() => setOpen(false)}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20 }}>Nutrition</h2>
+      {/* Expanded content */}
+      <div className={`card-expandable${open ? ' open' : ''}`}>
+        <div className="card-expandable-inner" ref={expandRef}>
+          <div className="card-divider" />
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
-          <MetricRow icon={<Flame size={16} color="var(--accent-purple-light)" />} label="Calories In" value={`${calories.toLocaleString()} kcal`} />
-          <MetricRow icon={<Flame size={16} color="var(--text-muted)" />} label="Calories Out" value={`${caloriesOut.toLocaleString()} kcal`} />
-          <MetricRow icon={<Flame size={16} color="var(--accent-purple)" />} label="Active Cal" value={`${Math.round(todayActiveEnergy).toLocaleString()} kcal`} />
-          <MetricRow icon={<Flame size={16} color="var(--text-muted)" />} label="Resting Cal" value={`${Math.round(todayRestingEnergy).toLocaleString()} kcal`} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+            <MetricBox icon={<Flame size={14} color="var(--accent-purple-light)" />} label="Calories In" value={`${calories.toLocaleString()} kcal`} />
+            <MetricBox icon={<Flame size={14} color="var(--text-muted)" />} label="Calories Out" value={`${caloriesOut.toLocaleString()} kcal`} />
+            <MetricBox icon={<Flame size={14} color="var(--accent-purple)" />} label="Active Cal" value={`${Math.round(todayActiveEnergy).toLocaleString()} kcal`} />
+            <MetricBox icon={<Flame size={14} color="var(--text-muted)" />} label="Resting Cal" value={`${Math.round(todayRestingEnergy).toLocaleString()} kcal`} />
+          </div>
+
+          <div style={{ background: 'var(--bg-card-elevated)', borderRadius: 14, padding: 16, marginBottom: 16 }}>
+            <MacroRow icon={<Dumbbell size={14} color="var(--accent-purple-light)" />} label="Protein" value={protein} goal={PROTEIN_GOAL} color="var(--accent-purple)" />
+            <MacroRow icon={<Wheat size={14} color="var(--accent-blue-light)" />} label="Carbs" value={carbs} color="var(--accent-blue)" />
+            <MacroRow icon={<Droplets size={14} color="var(--text-secondary)" />} label="Fat" value={fat} color="var(--text-muted)" />
+          </div>
+
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px',
+            background: isDeficit ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+            border: `1px solid ${isDeficit ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)'}`,
+            borderRadius: 12, marginBottom: 20,
+          }}>
+            {isDeficit ? <TrendingDown size={15} color="var(--status-green)" /> : <TrendingUp size={15} color="var(--status-red)" />}
+            <span style={{ fontSize: 13, fontWeight: 600, color: isDeficit ? 'var(--status-green)' : 'var(--status-red)' }}>
+              {isDeficit ? 'Deficit' : 'Surplus'} {Math.abs(net).toLocaleString()} kcal today
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+              This week avg: <strong style={{ color: 'var(--text-primary)' }}>{avgThis}</strong>
+            </span>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+              Last week: <strong style={{ color: 'var(--text-primary)' }}>{avgLast}</strong>
+            </span>
+          </div>
+
+          <p className="stat-label" style={{ marginBottom: 12 }}>Daily Calories</p>
+          <TimeRangeSelector value={range} onChange={setRange} />
+          <ResponsiveContainer width="100%" height={160}>
+            <BarChart data={rangeData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+              <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+              <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+              <Tooltip
+                contentStyle={{ background: 'var(--bg-card-elevated)', border: '1px solid var(--border-card)', borderRadius: 10 }}
+                labelStyle={{ color: 'var(--text-secondary)', fontSize: 11 }}
+                itemStyle={{ color: 'var(--text-primary)', fontSize: 12 }}
+              />
+              <ReferenceLine y={CALORIE_GOAL} stroke="var(--accent-purple)" strokeDasharray="4 2" strokeWidth={1} />
+              <Bar dataKey="cal" fill="url(#calGrad)" radius={[4, 4, 0, 0]} />
+              <defs>
+                <linearGradient id="calGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--accent-purple-light)" />
+                  <stop offset="100%" stopColor="var(--accent-blue)" stopOpacity={0.6} />
+                </linearGradient>
+              </defs>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
-
-        <div style={{ background: 'var(--bg-card-elevated)', borderRadius: 14, padding: 16, marginBottom: 20 }}>
-          <MacroRow icon={<Dumbbell size={14} color="var(--accent-purple-light)" />} label="Protein" value={protein} goal={PROTEIN_GOAL} color="var(--accent-purple)" />
-          <MacroRow icon={<Wheat size={14} color="var(--accent-blue-light)" />} label="Carbs" value={carbs} color="var(--accent-blue)" />
-          <MacroRow icon={<Droplets size={14} color="var(--text-secondary)" />} label="Fat" value={fat} color="var(--text-muted)" />
-        </div>
-
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px',
-          background: isDeficit ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
-          border: `1px solid ${isDeficit ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)'}`,
-          borderRadius: 12, marginBottom: 24,
-        }}>
-          {isDeficit
-            ? <TrendingDown size={16} color="var(--status-green)" />
-            : <TrendingUp size={16} color="var(--status-red)" />
-          }
-          <span style={{ fontSize: 14, fontWeight: 600, color: isDeficit ? 'var(--status-green)' : 'var(--status-red)' }}>
-            {isDeficit ? 'Deficit' : 'Surplus'} {Math.abs(net).toLocaleString()} kcal today
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-          <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-            This week avg: <strong style={{ color: 'var(--text-primary)' }}>{avgThis}</strong>
-          </span>
-          <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-            Last week: <strong style={{ color: 'var(--text-primary)' }}>{avgLast}</strong>
-          </span>
-        </div>
-
-        <p className="stat-label" style={{ marginBottom: 12 }}>Daily Calories</p>
-        <TimeRangeSelector value={range} onChange={setRange} />
-        <ResponsiveContainer width="100%" height={160}>
-          <BarChart data={rangeData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-            <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-            <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-            <Tooltip
-              contentStyle={{ background: 'var(--bg-card-elevated)', border: '1px solid var(--border-card)', borderRadius: 10 }}
-              labelStyle={{ color: 'var(--text-secondary)', fontSize: 11 }}
-              itemStyle={{ color: 'var(--text-primary)', fontSize: 12 }}
-            />
-            <ReferenceLine y={CALORIE_GOAL} stroke="var(--accent-purple)" strokeDasharray="4 2" strokeWidth={1} />
-            <Bar dataKey="cal" fill="url(#calGrad)" radius={[4, 4, 0, 0]} />
-            <defs>
-              <linearGradient id="calGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--accent-purple-light)" />
-                <stop offset="100%" stopColor="var(--accent-blue)" stopOpacity={0.6} />
-              </linearGradient>
-            </defs>
-          </BarChart>
-        </ResponsiveContainer>
-      </DetailDrawer>
-    </>
+      </div>
+    </div>
   );
 }
 
-function MetricRow({ icon, label, value }) {
+function MetricBox({ icon, label, value }) {
   return (
     <div style={{ background: 'var(--bg-card-elevated)', borderRadius: 12, padding: '10px 14px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
