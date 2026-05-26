@@ -1,0 +1,253 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-card: #13131a;
+  --bg-card-elevated: #1a1a24;
+  --bg-card-hover: #1f1f2e;
+
+  --accent-purple: #7c3aed;
+  --accent-purple-light: #a855f7;
+  --accent-blue: #3b82f6;
+  --accent-blue-light: #60a5fa;
+  --accent-gradient: linear-gradient(135deg, #7c3aed, #3b82f6);
+
+  --status-green: #22c55e;
+  --status-amber: #f59e0b;
+  --status-red: #ef4444;
+
+  --readiness-push: #22c55e;
+  --readiness-moderate: #f59e0b;
+  --readiness-recover: #ef4444;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-card: rgba(255, 255, 255, 0.08);
+
+  --font-display: 'SF Pro Display', system-ui, -apple-system, sans-serif;
+  --font-body: 'SF Pro Text', system-ui, -apple-system, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', monospace;
+
+  --radius-card: 20px;
+  --radius-pill: 999px;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* Card base */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-card);
+  padding: 20px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: transform 150ms ease, background 150ms ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card:active {
+  transform: scale(0.98);
+  background: var(--bg-card-hover);
+}
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-card) 25%,
+    var(--bg-card-elevated) 50%,
+    var(--bg-card) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.9); }
+}
+
+/* Card stagger entrance */
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stat label */
+.stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Stat value */
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* Pill */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Progress bar */
+.progress-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg-card-elevated);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 600ms ease;
+}
+
+/* Drawer overlay */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  animation: fadeIn 200ms ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.drawer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 85vh;
+  background: var(--bg-card);
+  border-radius: 24px 24px 0 0;
+  border-top: 1px solid var(--border-card);
+  z-index: 101;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  animation: slideUp 280ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.drawer-content {
+  padding: 16px 20px 40px;
+}
+
+/* Time range selector */
+.time-range-selector {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.time-range-btn {
+  flex: 1;
+  padding: 6px 0;
+  border: 1px solid var(--border-card);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+  font-family: var(--font-body);
+}
+
+.time-range-btn.active {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  color: white;
+}
+
+/* Recharts overrides */
+.recharts-text {
+  fill: var(--text-muted);
+  font-size: 11px;
+  font-family: var(--font-body);
+}
+
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: var(--border-subtle);
+}
+
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: var(--bg-card-elevated) !important;
+  border: 1px solid var(--border-card) !important;
+  border-radius: 12px !important;
+  color: var(--text-primary) !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 0;
+}
