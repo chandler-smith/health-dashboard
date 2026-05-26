@@ -29,8 +29,8 @@ export default function App() {
         <header style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '20px 0 16px',
+          justifyContent: 'center',
+          padding: '16px 0 8px',
           position: 'sticky',
           top: 0,
           zIndex: 10,

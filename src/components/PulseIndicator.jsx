@@ -36,28 +36,27 @@ export default function PulseIndicator({ lastFetched }) {
   };
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
       <button
         onClick={() => setShowTooltip(v => !v)}
+        aria-label="Data sync status"
         style={{
           background: 'none',
           border: 'none',
           cursor: 'pointer',
-          padding: 6,
+          padding: '10px 16px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          minWidth: 44,
           minHeight: 44,
         }}
-        aria-label="Data sync status"
       >
         <span
           style={{
             display: 'block',
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
+            width: 72,
+            height: 5,
+            borderRadius: 999,
             background: colors[status],
             animation: animations[status],
           }}
@@ -66,10 +65,12 @@ export default function PulseIndicator({ lastFetched }) {
 
       {showTooltip && (
         <div
+          onClick={() => setShowTooltip(false)}
           style={{
             position: 'absolute',
             top: '100%',
-            right: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
             background: 'var(--bg-card-elevated)',
             border: '1px solid var(--border-card)',
             borderRadius: 10,
@@ -80,7 +81,6 @@ export default function PulseIndicator({ lastFetched }) {
             zIndex: 50,
             boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
           }}
-          onClick={() => setShowTooltip(false)}
         >
           Last synced: {formatAge(lastFetched)}
         </div>
