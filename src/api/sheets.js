@@ -1,7 +1,7 @@
 const SHEET_ID = import.meta.env.VITE_SHEET_ID;
 const API_KEY = import.meta.env.VITE_SHEETS_API_KEY;
 const BASE_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values`;
-const CACHE_DURATION = 30 * 60 * 1000;
+const CACHE_DURATION = 10 * 60 * 1000;
 
 const cache = {};
 
@@ -33,6 +33,10 @@ export async function getDailySummary() {
 
 export async function getReadiness() {
   return fetchRange('Readiness!A2:K200');
+}
+
+export async function getInsights() {
+  return fetchRange('Insights!A2:D50');
 }
 
 export function clearCache() {

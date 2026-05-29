@@ -1,50 +1,62 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getFoodLog, getHealthData, getDailySummary, getReadiness } from '../api/sheets';
+import { getFoodLog, getHealthData, getDailySummary, getReadiness, getInsights } from '../api/sheets';
 import {
   parseFoodLog,
   parseHealthData,
   parseDailySummary,
   parseReadiness,
+  parseInsights,
 } from '../utils/dataTransform';
 
-const STALE_THRESHOLD = 30 * 60 * 1000;
+const STALE_THRESHOLD = 10 * 60 * 1000;
 
 export function useHealthData() {
   const [state, setState] = useState({
     loading: true,
     error: null,
     lastFetched: null,
+    healthDataDate: null,
     foodLog: [],
     healthData: [],
     dailySummary: [],
     readiness: [],
+    insights: [],
   });
 
   const fetchAll = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     try {
-      const [food, health, summary, readiness] = await Promise.all([
+      const [food, health, summary, readiness, insightsRaw] = await Promise.all([
         getFoodLog(),
         getHealthData(),
         getDailySummary(),
         getReadiness(),
+        getInsights(),
       ]);
 
       const latestTimestamp = Math.max(
         food.timestamp,
         health.timestamp,
         summary.timestamp,
-        readiness.timestamp
+        readiness.timestamp,
+        insightsRaw.timestamp,
       );
+
+      const parsedHealth = parseHealthData(health.data);
+      const healthDataDate = parsedHealth.length
+        ? parsedHealth[parsedHealth.length - 1].date
+        : null;
 
       setState({
         loading: false,
         error: null,
         lastFetched: latestTimestamp,
+        healthDataDate,
         foodLog: parseFoodLog(food.data),
-        healthData: parseHealthData(health.data),
+        healthData: parsedHealth,
         dailySummary: parseDailySummary(summary.data),
         readiness: parseReadiness(readiness.data),
+        insights: parseInsights(insightsRaw.data),
       });
     } catch (err) {
       setState(prev => ({
@@ -59,7 +71,6 @@ export function useHealthData() {
     fetchAll();
   }, [fetchAll]);
 
-  // Re-fetch on tab visibility if cache is stale
   useEffect(() => {
     function onVisibilityChange() {
       if (document.visibilityState === 'visible') {

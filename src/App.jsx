@@ -1,17 +1,23 @@
 import './index.css';
 import { useHealthData } from './hooks/useHealthData';
 import PulseIndicator from './components/PulseIndicator';
+import TodayStrip from './components/TodayStrip';
 import NutritionCard from './components/NutritionCard';
 import ReadinessCard from './components/ReadinessCard';
-import ActivityCard from './components/ActivityCard';
 import WeightCard from './components/WeightCard';
+import ActivityCard from './components/ActivityCard';
+import InsightsCard from './components/InsightsCard';
 import RecentMealsCard from './components/RecentMealsCard';
 import SkeletonCard from './components/SkeletonCard';
 
-const CARD_HEIGHTS = [140, 130, 120, 130, 200];
+const SKELETON_HEIGHTS = [56, 130, 130, 120, 120, 200, 240];
 
 export default function App() {
-  const { loading, error, lastFetched, foodLog, healthData, dailySummary, readiness, refetch } = useHealthData();
+  const {
+    loading, error, healthDataDate,
+    foodLog, healthData, dailySummary, readiness, insights,
+    refetch,
+  } = useHealthData();
 
   return (
     <div style={{
@@ -36,7 +42,7 @@ export default function App() {
           zIndex: 10,
           background: 'var(--bg-primary)',
         }}>
-          <PulseIndicator lastFetched={lastFetched} />
+          <PulseIndicator healthDataDate={healthDataDate} />
         </header>
 
         {error && (
@@ -72,7 +78,7 @@ export default function App() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {loading ? (
-            CARD_HEIGHTS.map((h, i) => (
+            SKELETON_HEIGHTS.map((h, i) => (
               <div key={i} style={{ animation: `cardIn 400ms ease ${i * 60}ms both` }}>
                 <SkeletonCard height={h} />
               </div>
@@ -80,18 +86,24 @@ export default function App() {
           ) : (
             <>
               <AnimatedCard delay={0}>
-                <NutritionCard dailySummary={dailySummary} healthData={healthData} />
+                <TodayStrip readiness={readiness} dailySummary={dailySummary} />
               </AnimatedCard>
               <AnimatedCard delay={60}>
-                <ReadinessCard readiness={readiness} />
+                <NutritionCard dailySummary={dailySummary} />
               </AnimatedCard>
               <AnimatedCard delay={120}>
-                <ActivityCard healthData={healthData} />
+                <ReadinessCard readiness={readiness} />
               </AnimatedCard>
               <AnimatedCard delay={180}>
                 <WeightCard healthData={healthData} />
               </AnimatedCard>
               <AnimatedCard delay={240}>
+                <ActivityCard healthData={healthData} />
+              </AnimatedCard>
+              <AnimatedCard delay={300}>
+                <InsightsCard insights={insights} />
+              </AnimatedCard>
+              <AnimatedCard delay={360}>
                 <RecentMealsCard foodLog={foodLog} />
               </AnimatedCard>
             </>

@@ -1,27 +1,29 @@
 import { useState } from 'react';
+import { getToday, formatChartDate } from '../utils/dataTransform';
 
-function getStatus(lastFetched) {
-  if (!lastFetched) return 'error';
-  const ageMs = Date.now() - lastFetched;
-  const ageHr = ageMs / 3600000;
-  if (ageHr < 2) return 'fresh';
-  if (ageHr < 12) return 'stale';
+function getStatus(healthDataDate) {
+  if (!healthDataDate) return 'error';
+  if (healthDataDate === getToday()) return 'fresh';
+  const d = new Date(healthDataDate + 'T00:00:00');
+  const ageHours = (Date.now() - d.getTime()) / 3600000;
+  if (ageHours < 36) return 'stale';
   return 'error';
 }
 
-function formatAge(lastFetched) {
-  if (!lastFetched) return 'Never';
-  const ageMs = Date.now() - lastFetched;
-  const ageMin = Math.floor(ageMs / 60000);
-  if (ageMin < 1) return 'Just now';
-  if (ageMin < 60) return `${ageMin}m ago`;
-  const ageHr = Math.floor(ageMin / 60);
-  return `${ageHr}h ago`;
+function formatHealthDate(healthDataDate) {
+  if (!healthDataDate) return 'unknown';
+  const today = getToday();
+  if (healthDataDate === today) return 'today';
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+  if (healthDataDate === yStr) return 'yesterday';
+  return formatChartDate(healthDataDate);
 }
 
-export default function PulseIndicator({ lastFetched }) {
+export default function PulseIndicator({ healthDataDate }) {
   const [showTooltip, setShowTooltip] = useState(false);
-  const status = getStatus(lastFetched);
+  const status = getStatus(healthDataDate);
 
   const colors = {
     fresh: 'var(--status-green)',
@@ -74,15 +76,19 @@ export default function PulseIndicator({ lastFetched }) {
             background: 'var(--bg-card-elevated)',
             border: '1px solid var(--border-card)',
             borderRadius: 10,
-            padding: '8px 12px',
+            padding: '8px 14px',
             fontSize: 12,
             color: 'var(--text-secondary)',
-            whiteSpace: 'nowrap',
             zIndex: 50,
             boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+            maxWidth: 260,
+            textAlign: 'center',
+            lineHeight: 1.5,
           }}
         >
-          Last synced: {formatAge(lastFetched)}
+          Health data as of {formatHealthDate(healthDataDate)}.
+          <br />
+          Food logs update when at desktop.
         </div>
       )}
     </div>
